@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trade Performance Analyzer</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#0f1c4d,#5a7cff);
+    padding: 30px;
+  }
+
+  .card {
+    max-width: 850px;
+    margin: auto;
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px;
+  }
+
+  h2 {
+    margin-bottom: 25px;
+  }
+
+  .row {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  input {
+    width: 100%;
+    padding: 8px;
+    font-size: 15px;
+  }
+
+  .benchmarks {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .benchmark-btn {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background: #e5e7eb;
+    font-weight: bold;
+  }
+
+  .benchmark-btn.active {
+    background: #1e40af;
+    color: white;
+  }
+
+  button.calculate {
+    width: 100%;
+    padding: 14px;
+    background: #2563eb;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  .result {
+    background: #eaf4ff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 25px;
+  }
+
+  .result div {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+
+  .bad { color: #b91c1c; font-weight: bold; }
+  .good { color: #0369a1; font-weight: bold; }
+  .excellent { color: #047857; font-weight: bold; }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Trade Performance Analyzer</h2>
+
+  <div class="row">
+    <label>Number of Shares</label>
+    <input type="number" id="shares" value="100">
+  </div>
+
+  <div class="row">
+    <label>Average Buy Price (₹)</label>
+    <input type="number" id="buyPrice" value="100">
+  </div>
+
+  <div class="row">
+    <label>Sell Price per Share (₹)</label>
+    <input type="number" id="sellPrice" value="120">
+  </div>
+
+  <div class="row">
+    <label>Start Date</label>
+    <input type="date" id="start">
+  </div>
+
+  <div class="row">
+    <label>End Date</label>
+    <input type="date" id="end">
+  </div>
+
+  <div class="row">
+    <label>Benchmark Return (% p.a.)</label>
+    <div class="benchmarks">
+      <button type="button" class="benchmark-btn" onclick="setBenchmark(36, this)">36%</button>
+      <button type="button" class="benchmark-btn" onclick="setBenchmark(48, this)">48%</button>
+      <button type="button" class="benchmark-btn active" onclick="setBenchmark(60, this)">60%</button>
+      <button type="button" class="benchmark-btn" onclick="setBenchmark(72, this)">72%</button>
+    </div>
+    <input type="number" id="rate" value="60" readonly>
+  </div>
+
+  <button class="calculate" onclick="calculate()">Calculate</button>
+
+  <div class="result">
+    <div>
+      <span>Total Investment</span>
+      <span id="investment">-</span>
+    </div>
+    <div>
+      <span>Total Amount Received</span>
+      <span id="received">-</span>
+    </div>
+    <div>
+      <span>Holding Period</span>
+      <span id="period">-</span>
+    </div>
+    <div>
+      <span>Actual Profit</span>
+      <span id="actualProfit">-</span>
+    </div>
+    <div>
+      <span>Expected @ Benchmark</span>
+      <span id="expectedProfit">-</span>
+    </div>
+    <div>
+      <span>Status</span>
+      <span id="status">-</span>
+    </div>
+  </div>
+</div>
+
+<script>
+function setBenchmark(value, btn) {
+  document.getElementById("rate").value = value;
+  document.querySelectorAll(".benchmark-btn")
+    .forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+function calculate() {
+  const shares = Number(document.getElementById("shares").value);
+  const buyPrice = Number(document.getElementById("buyPrice").value);
+  const sellPrice = Number(document.getElementById("sellPrice").value);
+  const rate = Number(document.getElementById("rate").value);
+
+  const start = new Date(document.getElementById("start").value);
+  const end = new Date(document.getElementById("end").value);
+
+  if (!start || !end || end <= start) {
+    alert("Please select valid dates");
+    return;
+  }
+
+  const investment = shares * buyPrice;
+  const received = shares * sellPrice;
+  const actualProfit = received - investment;
+  const actualPct = (actualProfit / investment) * 100;
+
+  const days = (end - start) / (1000 * 60 * 60 * 24);
+  const years = days / 365;
+
+  // SIMPLE prorated benchmark (correct for short-term trades)
+  const expectedProfit = investment * (rate / 100) * years;
+  const expectedPct = (expectedProfit / investment) * 100;
+
+  document.getElementById("investment").innerText =
+    "₹" + investment.toLocaleString();
+
+  document.getElementById("received").innerText =
+    "₹" + received.toLocaleString();
+
+  document.getElementById("period").innerText =
+    `${Math.round(days)} days (${years.toFixed(2)} years)`;
+
+  document.getElementById("actualProfit").innerText =
+    `₹${actualProfit.toLocaleString()} (${actualPct.toFixed(2)}%)`;
+
+  document.getElementById("expectedProfit").innerText =
+    `₹${expectedProfit.toLocaleString()} (${expectedPct.toFixed(2)}%)`;
+
+  let text = "", cls = "";
+
+  if (actualPct < 30) {
+    text = `FAIL – does not meet minimum target (30%)`;
+    cls = "bad";
+  }
+  else if (actualPct < rate) {
+    text = `PASS – meets minimum but below benchmark (${rate}%)`;
+    cls = "good";
+  }
+  else {
+    text = `OUTPERFORM – exceeds benchmark (${rate}%)`;
+    cls = "excellent";
+  }
+
+  document.getElementById("status").innerHTML =
+    `<span class="${cls}">${text}</span>`;
+}
+</script>
+
+</body>
+</html>
