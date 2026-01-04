@@ -12,7 +12,7 @@
   }
 
   .card {
-    max-width: 750px;
+    max-width: 800px;
     margin: auto;
     background: #fff;
     border-radius: 16px;
@@ -41,18 +41,14 @@
 
   button {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     background: #2563eb;
     color: white;
     font-size: 16px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     margin-top: 10px;
-  }
-
-  button:hover {
-    background: #1e40af;
   }
 
   .result {
@@ -69,15 +65,9 @@
     font-size: 16px;
   }
 
-  .badge {
-    font-weight: bold;
-    padding: 6px 10px;
-    border-radius: 6px;
-  }
-
-  .bad { color: #b91c1c; }
-  .good { color: #0369a1; }
-  .excellent { color: #047857; }
+  .bad { color: #b91c1c; font-weight: bold; }
+  .good { color: #0369a1; font-weight: bold; }
+  .excellent { color: #047857; font-weight: bold; }
 </style>
 </head>
 
@@ -87,8 +77,13 @@
   <h2>Profit vs 60% p.a. Comparison</h2>
 
   <div class="row">
-    <label>Total Investment (Buy Price ₹)</label>
-    <input type="number" id="buy" value="100000">
+    <label>Number of Shares</label>
+    <input type="number" id="shares" value="100">
+  </div>
+
+  <div class="row">
+    <label>Average Buy Price (₹)</label>
+    <input type="number" id="buyPrice" value="10">
   </div>
 
   <div class="row">
@@ -107,13 +102,21 @@
   </div>
 
   <div class="row">
-    <label>Total Amount Received (Sell Price ₹)</label>
-    <input type="number" id="sell" value="160000">
+    <label>Sell Price per Share (₹)</label>
+    <input type="number" id="sellPrice" value="15">
   </div>
 
   <button onclick="calculate()">Calculate</button>
 
   <div class="result">
+    <div>
+      <span>Total Investment</span>
+      <span id="investment">-</span>
+    </div>
+    <div>
+      <span>Total Amount Received</span>
+      <span id="received">-</span>
+    </div>
     <div>
       <span>Holding Period</span>
       <span id="period">-</span>
@@ -135,22 +138,33 @@
 
 <script>
 function calculate() {
-  const buy = Number(document.getElementById("buy").value);
-  const sell = Number(document.getElementById("sell").value);
+  const shares = Number(document.getElementById("shares").value);
+  const buyPrice = Number(document.getElementById("buyPrice").value);
+  const sellPrice = Number(document.getElementById("sellPrice").value);
   const rate = Number(document.getElementById("rate").value);
+
   const start = new Date(document.getElementById("start").value);
   const end = new Date(document.getElementById("end").value);
 
   if (!start || !end || end <= start) {
-    alert("Please select valid start and end dates");
+    alert("Please select valid dates");
     return;
   }
+
+  const investment = shares * buyPrice;
+  const received = shares * sellPrice;
 
   const days = (end - start) / (1000 * 60 * 60 * 24);
   const years = days / 365;
 
-  const cagr = ((sell / buy) ** (1 / years) - 1) * 100;
-  const expected = buy * ((1 + rate / 100) ** years);
+  const cagr = ((received / investment) ** (1 / years) - 1) * 100;
+  const expected = investment * ((1 + rate / 100) ** years);
+
+  document.getElementById("investment").innerText =
+    "₹" + investment.toLocaleString();
+
+  document.getElementById("received").innerText =
+    "₹" + received.toLocaleString();
 
   document.getElementById("period").innerText =
     `${Math.round(days)} days (${years.toFixed(2)} years)`;
@@ -161,22 +175,20 @@ function calculate() {
   document.getElementById("expected").innerText =
     "₹" + expected.toLocaleString();
 
-  let statusText = "";
-  let cls = "";
-
-  if (cagr < 48) {
-    statusText = "❌ Not even break even";
+  let text = "", cls = "";
+  if (cagr < 30) {
+    text = "❌ Not even break even";
     cls = "bad";
   } else if (cagr <= 60) {
-    statusText = "✅ Good";
+    text = "✅ Good";
     cls = "good";
   } else {
-    statusText = "🚀 Excellent";
+    text = "🚀 Excellent";
     cls = "excellent";
   }
 
   document.getElementById("status").innerHTML =
-    `<span class="${cls}">${statusText}</span>`;
+    `<span class="${cls}">${text}</span>`;
 }
 </script>
 
