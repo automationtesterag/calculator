@@ -109,31 +109,31 @@
   <button onclick="calculate()">Calculate</button>
 
   <div class="result">
-    <div>
-      <span>Total Investment</span>
-      <span id="investment">-</span>
-    </div>
-    <div>
-      <span>Total Amount Received</span>
-      <span id="received">-</span>
-    </div>
-    <div>
-      <span>Holding Period</span>
-      <span id="period">-</span>
-    </div>
-    <div>
-      <span>Actual CAGR</span>
-      <span id="cagr">-</span>
-    </div>
-    <div>
-      <span>Expected @ Benchmark</span>
-      <span id="expected">-</span>
-    </div>
-    <div>
-      <span>Result</span>
-      <span id="status">-</span>
-    </div>
+  <div>
+    <span>Total Investment</span>
+    <span id="investment">-</span>
   </div>
+  <div>
+    <span>Total Amount Received</span>
+    <span id="received">-</span>
+  </div>
+  <div>
+    <span>Holding Period</span>
+    <span id="period">-</span>
+  </div>
+  <div>
+    <span>Actual Profit</span>
+    <span id="actualProfit">-</span>
+  </div>
+  <div>
+    <span>Expected @ Benchmark</span>
+    <span id="expectedProfit">-</span>
+  </div>
+  <div>
+    <span>Result</span>
+    <span id="status">-</span>
+  </div>
+</div>
 </div>
 
 <script>
@@ -153,12 +153,19 @@ function calculate() {
 
   const investment = shares * buyPrice;
   const received = shares * sellPrice;
+  const actualProfit = received - investment;
 
   const days = (end - start) / (1000 * 60 * 60 * 24);
   const years = days / 365;
 
-  const cagr = ((received / investment) ** (1 / years) - 1) * 100;
-  const expected = investment * ((1 + rate / 100) ** years);
+  const expectedAmount = investment * ((1 + rate / 100) ** years);
+  const expectedProfit = expectedAmount - investment;
+
+  const actualPct = (actualProfit / investment) * 100;
+  const expectedPct = (expectedProfit / investment) * 100;
+
+  const diffAmount = actualProfit - expectedProfit;
+  const diffPct = actualPct - expectedPct;
 
   document.getElementById("investment").innerText =
     "₹" + investment.toLocaleString();
@@ -169,21 +176,22 @@ function calculate() {
   document.getElementById("period").innerText =
     `${Math.round(days)} days (${years.toFixed(2)} years)`;
 
-  document.getElementById("cagr").innerText =
-    cagr.toFixed(2) + "%";
+  document.getElementById("actualProfit").innerText =
+    `₹${actualProfit.toLocaleString()} (${actualPct.toFixed(2)}%)`;
 
-  document.getElementById("expected").innerText =
-    "₹" + expected.toLocaleString();
+  document.getElementById("expectedProfit").innerText =
+    `₹${expectedProfit.toLocaleString()} (${expectedPct.toFixed(2)}%)`;
 
   let text = "", cls = "";
-  if (cagr < 30) {
-    text = "❌ Not even break even";
+
+  if (actualPct < 48) {
+    text = `❌ ₹${Math.abs(diffAmount).toLocaleString()} (${Math.abs(diffPct).toFixed(2)}%) less than expected`;
     cls = "bad";
-  } else if (cagr <= 60) {
-    text = "✅ Good";
+  } else if (actualPct <= 60) {
+    text = `✅ ₹${Math.abs(diffAmount).toLocaleString()} (${Math.abs(diffPct).toFixed(2)}%) close to benchmark`;
     cls = "good";
   } else {
-    text = "🚀 Excellent";
+    text = `🚀 ₹${diffAmount.toLocaleString()} (${diffPct.toFixed(2)}%) more than expected`;
     cls = "excellent";
   }
 
@@ -191,6 +199,7 @@ function calculate() {
     `<span class="${cls}">${text}</span>`;
 }
 </script>
+
 
 </body>
 </html>
