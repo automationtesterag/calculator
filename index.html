@@ -210,26 +210,27 @@ function calculate() {
     `${Math.round(days)} days (${years.toFixed(2)} years)`;
 
   document.getElementById("actualProfit").innerText =
-    `₹${actualProfit.toLocaleString()} (${annualisedActualPct.toFixed(2)}% p.a.)`;
+  `₹${actualProfit.toLocaleString()} (${annualisedActualPct.toFixed(2)}% p.a.)`;
 
   document.getElementById("expectedProfit").innerText =
     `₹${expectedProfit.toLocaleString()} (${expectedPct.toFixed(2)}%)`;
 
   let text = "", cls = "";
 
-  // ✅ FINAL, CORRECT STATUS LOGIC
-  if (annualisedActualPct < 30) {
-    text = "FAIL – does not meet minimum target (30% p.a.)";
-    cls = "bad";
-  }
-  else if (annualisedActualPct < rate) {
-    text = `PASS – meets minimum but below benchmark (${rate}% p.a.)`;
-    cls = "good";
-  }
-  else {
-    text = `OUTPERFORM – exceeds benchmark (${rate}% p.a.)`;
-    cls = "excellent";
-  }
+// 🔥 USE ANNUALISED RETURN ONLY
+if (annualisedActualPct < 30) {
+  text = "FAIL – does not meet minimum target (30% p.a.)";
+  cls = "bad";
+}
+else if (annualisedActualPct < rate) {
+  text = `PASS – meets minimum but below benchmark (${rate}% p.a.)`;
+  cls = "good";
+}
+else {
+  text = `OUTPERFORM – exceeds benchmark (${rate}% p.a.)`;
+  cls = "excellent";
+}
+
 
   document.getElementById("status").innerHTML =
     `<span class="${cls}">${text}</span>`;
