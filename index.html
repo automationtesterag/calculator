@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dividend vs FD Calculator</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#0f1c4d,#5a7cff);
+    padding: 30px;
+  }
+
+  .card {
+    max-width: 700px;
+    margin: auto;
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px;
+  }
+
+  h2 {
+    margin-bottom: 20px;
+  }
+
+  .row {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  input[type="number"] {
+    width: 120px;
+    padding: 6px;
+    float: right;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .result {
+    background: #eaf4ff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 25px;
+  }
+
+  .result div {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+
+  .highlight {
+    font-weight: bold;
+    color: #1e40af;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Dividend vs FD Calculator</h2>
+
+  <div class="row">
+    <label>Total Shares</label>
+    <input type="number" id="shares" value="3000">
+    <input type="range" min="1" max="100000" value="3000"
+           oninput="shares.value=this.value;calculate()">
+  </div>
+
+  <div class="row">
+    <label>Dividend per Share (₹)</label>
+    <input type="number" step="0.1" id="dividend" value="1.1">
+    <input type="range" min="0.1" max="100" step="0.1" value="1.1"
+           oninput="dividend.value=this.value;calculate()">
+  </div>
+
+  <div class="row">
+    <label>Current Share Price (₹)</label>
+    <input type="number" step="0.1" id="price" value="10">
+    <input type="range" min="0.1" max="10000" step="0.1" value="10"
+           oninput="price.value=this.value;calculate()">
+  </div>
+
+  <div class="row">
+    <label>FD Rate (% p.a.)</label>
+    <input type="number" step="0.1" id="fdRate" value="7">
+    <input type="range" min="1" max="15" step="0.1" value="7"
+           oninput="fdRate.value=this.value;calculate()">
+  </div>
+
+  <div class="result">
+    <div>
+      <span>Total Dividend Received</span>
+      <span class="highlight" id="totalDividend">₹0</span>
+    </div>
+
+    <div>
+      <span>Total Investment</span>
+      <span class="highlight" id="investment">₹0</span>
+    </div>
+
+    <div>
+      <span>FD Interest (1 year)</span>
+      <span class="highlight" id="fdInterest">₹0</span>
+    </div>
+
+    <div>
+      <span>Dividend vs FD</span>
+      <span class="highlight" id="difference">₹0</span>
+    </div>
+  </div>
+</div>
+
+<script>
+function calculate() {
+  const shares = +document.getElementById("shares").value;
+  const dividend = +document.getElementById("dividend").value;
+  const price = +document.getElementById("price").value;
+  const fdRate = +document.getElementById("fdRate").value;
+
+  const totalDividend = shares * dividend;
+  const investment = shares * price;
+  const fdInterest = investment * fdRate / 100;
+  const difference = totalDividend - fdInterest;
+
+  document.getElementById("totalDividend").innerText =
+    "₹" + totalDividend.toLocaleString();
+
+  document.getElementById("investment").innerText =
+    "₹" + investment.toLocaleString();
+
+  document.getElementById("fdInterest").innerText =
+    "₹" + fdInterest.toLocaleString();
+
+  document.getElementById("difference").innerText =
+    (difference >= 0 ? "More by ₹" : "Less by ₹") +
+    Math.abs(difference).toLocaleString();
+}
+
+calculate();
+</script>
+
+</body>
+</html>
