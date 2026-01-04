@@ -94,7 +94,6 @@
   <div class="row">
     <label>Total Shares</label>
     <div class="input-box">
-      <span></span>
       <input type="number" id="shares" value="1000">
     </div>
     <input type="range" min="1" max="100000" value="1000"
@@ -104,7 +103,6 @@
   <div class="row">
     <label>Dividend per Share (₹)</label>
     <div class="input-box">
-      <span></span>
       <input type="number" id="dividend" value="4" step="0.1">
     </div>
     <input type="range" min="0.1" max="100" step="0.1" value="4"
@@ -112,9 +110,17 @@
   </div>
 
   <div class="row">
+    <label>Number of Dividends per Year</label>
+    <div class="input-box">
+      <input type="number" id="divCount" value="1">
+    </div>
+    <input type="range" min="1" max="12" value="1"
+      oninput="divCount.value=this.value">
+  </div>
+
+  <div class="row">
     <label>Current Share Price (₹)</label>
     <div class="input-box">
-      <span></span>
       <input type="number" id="price" value="241" step="0.1">
     </div>
     <input type="range" min="1" max="10000" step="1" value="241"
@@ -124,7 +130,6 @@
   <div class="row">
     <label>FD Rate (% p.a.)</label>
     <div class="input-box">
-      <span></span>
       <input type="number" id="fdRate" value="7" step="0.1">
     </div>
     <input type="range" min="1" max="15" step="0.1" value="7"
@@ -135,7 +140,7 @@
 
   <div class="result">
     <div>
-      <span>Total Dividend Received</span>
+      <span>Total Dividend Received (Year)</span>
       <span class="highlight" id="totalDividend">₹0</span>
     </div>
     <div>
@@ -157,10 +162,11 @@
 function calculate() {
   const shares = Number(document.getElementById("shares").value);
   const dividend = Number(document.getElementById("dividend").value);
+  const divCount = Number(document.getElementById("divCount").value);
   const price = Number(document.getElementById("price").value);
   const fdRate = Number(document.getElementById("fdRate").value);
 
-  const totalDividend = shares * dividend;
+  const totalDividend = shares * dividend * divCount;
   const investment = shares * price;
   const fdInterest = investment * fdRate / 100;
   const diff = totalDividend - fdInterest;
