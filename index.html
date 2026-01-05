@@ -156,6 +156,10 @@
       <span id="expectedProfit">-</span>
     </div>
     <div>
+  <span>Expected Sell Price (to beat benchmark)</span>
+  <span id="expectedSellPrice">-</span>
+</div>
+    <div>
       <span>Status</span>
       <span id="status">-</span>
     </div>
@@ -199,6 +203,10 @@ function calculate() {
   // ✅ Simple prorated benchmark (correct for short-term trades)
   const expectedProfit = investment * (rate / 100) * years;
   const expectedPct = (expectedProfit / investment) * 100;
+
+  const expectedTotalAmount = investment + expectedProfit;
+  const expectedSellPrice = expectedTotalAmount / shares;
+
 
   document.getElementById("investment").innerText =
     "₹" + investment.toLocaleString();
