@@ -223,6 +223,9 @@ function calculate() {
   document.getElementById("expectedProfit").innerText =
     `₹${expectedProfit.toLocaleString()} (${expectedPct.toFixed(2)}%)`;
 
+  document.getElementById("expectedSellPrice").innerText =
+  "₹" + expectedSellPrice.toFixed(2) + " per share";
+
   let text = "", cls = "";
 
 // 🔥 USE ANNUALISED RETURN ONLY
